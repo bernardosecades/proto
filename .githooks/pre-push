@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Check if there are pending changes under the given path
+# Fails the push if that is the case
+fail_if_unstaged() {
+  uncommitted=$(git status -s $1 | wc -l)
+  if [ $uncommitted -gt 0 ]
+  then
+    echo >&2 "hook: uncommitted changes at '$1'"
+    exit 1
+  fi
+}
+
+# Drop all uncommitted/untracked files under the supported languages
+clean_compiled_definitions() {
+  uncommitted=$(git status -s $1 | wc -l)
+  if [ $uncommitted -gt 0 ]
+  then
+    echo >&2 "hook: cleaning definitions at '$1'"
+    # Unstage any staged changes
+    git reset -- $1 > /dev/null
+    # Remove unstaged changes
+    git checkout -- $1 > /dev/null
+    # Remove untracked files
+    git clean -fd $1 > /dev/null
+  fi
+}
+
+# Run the lint
+echo "hook: run lint (skipping...)"
+
+# fail if uncommitted/untracked protobuf definitions
+fail_if_unstaged "protobuf"
+
+# Protobuf languages
+set -- "go"
+
+# Remove all uncommitted/untracked changes for the supported protobuf languages
+for path in $@
+do
+  clean_compiled_definitions "$path/protobuf"
+done
+
+# Compile protos and redirect stdout to /dev/null
+echo "hook: compiling protobuf definitions..."
+make proto > /dev/null
+
+# Stage any compiled file changes
+for path in $@
+do
+  fail_if_unstaged "$path/protobuf"
+done
+
+echo "hook: success!"
+exit 0

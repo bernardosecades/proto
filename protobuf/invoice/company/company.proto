@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bernardosecades.invoice.company;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "company";
+
+service CompanyService {
+    rpc SyncCompanies(google.protobuf.Empty) returns (google.protobuf.Empty);
+}

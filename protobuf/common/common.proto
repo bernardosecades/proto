@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package bernardosecades.common;
+
+option go_package = "github.com/bernardosecades/proto/go/protobuf/common";
+
+// example global proto to share
+message Something {}
+

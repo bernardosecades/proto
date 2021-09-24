@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package bernardosecades.invoice.creditnote;
+
+option go_package = "creditnote";
+
+import "google/protobuf/empty.proto";
+
+service CreditNoteService {
+    rpc Create(CreditNoteInput) returns (CreditNoteOutput);
+    rpc MigrateCreditNotes(MigrateCreditNotesInput) returns (google.protobuf.Empty);
+
+}
+
+message MigrateCreditNotesInput {
+  string from_date = 1;
+  string to_date = 2;
+}
+
+message CreditNoteOutput {
+  string credit_note_id = 1;
+}
+
+message CreditNoteInput {
+    string id = 1;
+    string due_date = 2;
+    string number = 3;
+    string customer_id = 4;
+}
